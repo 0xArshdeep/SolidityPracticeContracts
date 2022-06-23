@@ -1,6 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+contract AuctionCreator {
+    Auction[] public auctions;
+
+    function createAuction() public {
+        Auction newAuction = new Auction(msg.sender);
+        auctions.push(newAuction);
+    }
+}
+
 contract Auction {
     address payable public owner;
     uint256 public startBlock;
@@ -20,8 +29,8 @@ contract Auction {
     mapping(address => uint256) public bids;
     uint256 bidIncrement;
 
-    constructor() {
-        owner = payable(msg.sender);
+    constructor(address _eoa) {
+        owner = payable(_eoa);
         auctionState = State.Running;
         startBlock = block.number;
         endBlock = startBlock + 40320;
