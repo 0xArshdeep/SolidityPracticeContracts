@@ -3,14 +3,15 @@ pragma solidity ^0.8.0;
 
 contract Lottery {
     address payable[] public players;
-    address public manager;
+    address payable public manager;
 
     constructor() {
-        manager = msg.sender;
+        manager = payable(msg.sender);
     }
 
     receive() external payable {
         require(msg.value == 0.1 ether);
+        require(msg.sender != manager);
         players.push(payable(msg.sender));
     }
 
@@ -42,7 +43,8 @@ contract Lottery {
         uint256 index = r & players.length;
         winner = players[index];
 
-        winner.transfer(getBalance());
+        winner.transfer((getBalance() / 100) * 90); // winner receives 90% of the lottery funds
+        manager.transfer(getBalance()); // manager receives a fee of 10% of the lottery funds
         players = new address payable[](0); // resetting the lottery
     }
 }
